@@ -71,27 +71,27 @@ else
 fi
 
 
-echo "`date` INFO:Get repositories up to date" &>> ${LOG_FILE}
+#echo "`date` INFO:Get repositories up to date" &>> ${LOG_FILE}
 # ---------------------------------------
 
-yum -y update &>> ${LOG_FILE}
-yum -y install lvm2 &>> ${LOG_FILE}
+#yum -y update &>> ${LOG_FILE}
+#yum -y install lvm2 &>> ${LOG_FILE}
 
-echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
+#echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
 # -----------------------------------
-tee /etc/yum.repos.d/docker.repo <<-EOF
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/7/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-EOF
-echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  &>> ${LOG_FILE}
+#tee /etc/yum.repos.d/docker.repo <<-EOF
+#[dockerrepo]
+#name=Docker Repository
+#baseurl=https://yum.dockerproject.org/repo/main/centos/7/
+#enabled=1
+#gpgcheck=1
+#gpgkey=https://yum.dockerproject.org/gpg
+#EOF
+#echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  &>> ${LOG_FILE}
 
-echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
+#echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
 # -------------------------
-yum -y install docker-engine &>> ${LOG_FILE}
+#yum -y install docker-engine &>> ${LOG_FILE}
 
 echo "`date` INFO:Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
@@ -178,6 +178,17 @@ docker create \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
    --ulimit nofile=2448:1048576 \
+   --publish 80:80 \
+   --publish 443:443 \
+   --publish 8080:8080 \
+   --publish 9443:9443 \
+   --publish 55555:55555 \
+   --publish 55003:55003 \
+   --publish 55443:55443 \
+   --publish 8741:8741 \
+   --publish 8300:8300 \
+   --publish 8301:8301 \
+   --publish 8302:8302 \
    --cap-add=IPC_LOCK \
    --cap-add=SYS_NICE \
    --net=host \
@@ -213,3 +224,18 @@ echo "`date` INFO: Start the VMR"
 systemctl daemon-reload &>> ${LOG_FILE}
 systemctl enable solace-docker-vmr &>> ${LOG_FILE}
 systemctl start solace-docker-vmr &>> ${LOG_FILE}
+
+echo "adding firewall rules..."
+iptables -I INPUT 5 -p tcp -m tcp --dport 80 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 443 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 8080 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 9443 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 55555 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 55003 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 55443 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 8741 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 8300 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 8301 -j ACCEPT
+iptables -I INPUT 5 -p tcp -m tcp --dport 8302 -j ACCEPT
+
+echo "`date` INFO: Install is complete"

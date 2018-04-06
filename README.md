@@ -1,6 +1,6 @@
 # Install a Solace Message Router onto a Google Compute Engine Linux Virtual Machine
 
-The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds. 
+The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The VMR provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds.
 
 # How to Deploy a VMR
 This is a 3 step process:
@@ -11,8 +11,8 @@ This is a 3 step process:
     <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
 </a>
 
-* Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GB of memory, a CentOS 7 OS, and a disk with a
-size of at least 30 GB depolyed on Centos7 OS:
+* Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GB of memory, a Container Optimized OS, and a disk with a
+size of at least 30 GB depolyed on COS:
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
 
@@ -72,11 +72,11 @@ Cut and paste the code into the panel, replace -link to VMR Docker Image- with t
 if [ ! -d /var/lib/solace ]; then
   mkdir /var/lib/solace
   cd /var/lib/solace
-  yum install -y wget
+  #yum install -y wget
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
-    wget https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/vmr-install.sh
-    if [ 0 != `echo $?` ]; then 
+    wget https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/vmr-install.sh
+    if [ 0 != `echo $?` ]; then
       ((LOOP_COUNT++))
     else
       break
@@ -104,7 +104,7 @@ To initialise your VMR with HA group configuration, set the additional variable 
 - monitor node = ${baseroutername}0
 - primary node = ${baseroutername}1
 - backup node  = ${baseroutername}2
- 
+
 [All router names need to be based on the baseroutername followed by an index of 0, 1 or 2 as suffix]  
 Please note that dashes or underscores are not allowed in your baseroutername or routername and the script will fail to find your config-keys, if you attempt to use them in your names!
 
