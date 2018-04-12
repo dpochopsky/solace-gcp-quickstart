@@ -226,16 +226,17 @@ systemctl enable solace-docker-vmr &>> ${LOG_FILE}
 systemctl start solace-docker-vmr &>> ${LOG_FILE}
 
 echo "adding firewall rules..."
-iptables -I INPUT 5 -p tcp -m tcp --dport 80 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 443 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 8080 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 9443 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 55555 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 55003 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 55443 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 8741 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 8300 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 8301 -j ACCEPT
-iptables -I INPUT 5 -p tcp -m tcp --dport 8302 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 9443 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 55555 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 55003 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 55443 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8741 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8300 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8301 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8302 -j ACCEPT
+iptables-save > /mnt/stateful_partition/var_overlay/lib/iptables/rules.v4
 
 echo "`date` INFO: Install is complete"
