@@ -8,71 +8,79 @@ This is a 3 step process:
 * Go to the Solace Developer portal and request a Solace Community edition VMR. This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" hyperlink.  This link is of the form "http<nolink>://em.solace.com ?" will be needed in the following section.
 
 <a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
-    <img src="https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/register.png"/>
+    <img src="https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/images/register.png"/>
+    
 </a>
 
 * Go to your Google Cloud Platform console and create a Compute Engine instance.  Ensure at least 2 vCPU and 4 GB of memory, a Container Optimized OS, and a disk with a
 size of at least 30 GB depolyed on COS:
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_1.png "GCE Image creation 1")
+![alt text](https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/images/gce_launch_cos_1.png "GCE Image creation 1")
 
 * Expand the the Management tab to expose the Automation Startup script panel
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_2.png "GCE Image creation 2")
+![alt text](https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/images/gce_launch_cos_2.png "GCE Image creation 2")
 
 Cut and paste the code into the panel, replace -link to VMR Docker Image- with the URL you received in step one.
 
 ```
 #!/bin/bash
-###(optional) to set any config keys edit and uncomment the appropriate section
-### for the vmr role you are about to configure
-##These are example values for configuring a monitoring node
-#export baseroutername=gcevmr
-#export nodetype=monitoring
-#export routername=gcevmr0
+##Select one of the three below to configure your monitor/primary/backup node
+touch /tmp/startup_script_run
+#export vmr_role=monitor
+#export vmr_role=primary
+#export vmr_role=backup
+##General section - edit as required
+export baseroutername=cosvmr
+export vmradminpass=soladmingce
+export vmr_scaling=1000 #1000, 10000 or 100000
+#export monitor_ip=10.132.1.10
+#export primary_ip=10.132.1.11
+#export backup_ip=10.132.1.12
 #export redundancy_enable=yes
-#export redundancy_group_password=gruyerecheese
-#export redundancy_group_node_gcevmr0_connectvia=10.154.0.210
-#export redundancy_group_node_gcevmr0_nodetype=monitoring
-#export redundancy_group_node_gcevmr1_connectvia=10.154.0.211
-#export redundancy_group_node_gcevmr1_nodetype=message_routing
-#export redundancy_group_node_gcevmr2_connectvia=10.154.0.212
-#export redundancy_group_node_gcevmr2_nodetype=message_routing
-##These are example values for configuring a primary node
-#export baseroutername=gcevmr
-#export nodetype=message_routing
-#export routername=gcevmr1
-#export configsync_enable=yes
-#export redundancy_activestandbyrole=primary
-#export redundancy_enable=yes
-#export redundancy_group_password=gruyerecheese
-#export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
-#export redundancy_group_node_gcevmr0_nodetype=monitoring
-#export redundancy_group_node_gcevmr1_connectvia=10.154.0.2
-#export redundancy_group_node_gcevmr1_nodetype=message_routing
-#export redundancy_group_node_gcevmr2_connectvia=10.154.0.3
-#export redundancy_group_node_gcevmr2_nodetype=message_routing
-#export redundancy_matelink_connectvia=10.154.0.3
-##These are example values for configuring a backup node
-#export baseroutername=gcevmr
-#export nodetype=message_routing
-#export routername=gcevmr2
-#export configsync_enable=yes
-#export redundancy_activestandbyrole=backup
-#export redundancy_enable=yes
-#export redundancy_group_password=gruyerecheese
-#export redundancy_group_node_gcevmr0_connectvia=10.154.0.1
-#export redundancy_group_node_gcevmr0_nodetype=monitoring
-#export redundancy_group_node_gcevmr1_connectvia=10.154.0.2
-#export redundancy_group_node_gcevmr1_nodetype=message_routing
-#export redundancy_group_node_gcevmr2_connectvia=10.154.0.3
-#export redundancy_group_node_gcevmr2_nodetype=message_routing
-#export redundancy_matelink_connectvia=10.154.0.2
+#export redundancy_group_password=mysolgrouppass
+##General section - no editing required
+export redundancy_group_node_${baseroutername}0_connectvia=${monitor_ip}
+export redundancy_group_node_${baseroutername}0_nodetype=monitoring
+export redundancy_group_node_${baseroutername}1_connectvia=${primary_ip}
+export redundancy_group_node_${baseroutername}1_nodetype=message_routing
+export redundancy_group_node_${baseroutername}2_connectvia=${backup_ip}
+export redundancy_group_node_${baseroutername}2_nodetype=message_routing
+if [ "${vmr_role}" == "monitor" ]; then
+##values for your monitor node
+  export nodetype=monitoring
+  export routername=${baseroutername}0
+elif [ "${vmr_role}" == "primary" ]; then
+##values for your primary node
+  export nodetype=message_routing
+  export routername=${baseroutername}1
+  export system_scaling_maxconnectioncount=${vmr_scaling}
+  export configsync_enable=yes
+  export redundancy_activestandbyrole=primary
+  export redundancy_matelink_connectvia=${backup_ip}
+elif [ "${vmr_role}" == "backup" ]; then
+##values for your backup node
+  export nodetype=message_routing
+  export routername=${baseroutername}2
+  export configsync_enable=yes
+  export redundancy_activestandbyrole=backup
+  export system_scaling_maxconnectioncount=${vmr_scaling}
+  export redundancy_matelink_connectvia=${primary_ip}
+else
+  echo "no role selected, assuming stand-alone and disabling redundancy"
+  export redundancy_enable=no
+  export configsync_enable=no
+  unset redundancy_group_node_${baseroutername}0_connectvia
+  unset redundancy_group_node_${baseroutername}0_nodetype
+  unset redundancy_group_node_${baseroutername}1_connectvia
+  unset redundancy_group_node_${baseroutername}1_nodetype
+  unset redundancy_group_node_${baseroutername}2_connectvia
+  unset redundancy_group_node_${baseroutername}2_nodetype
+fi
 ###
 if [ ! -d /var/lib/solace ]; then
   mkdir /var/lib/solace
   cd /var/lib/solace
-  #yum install -y wget
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
     wget https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/vmr-install.sh
@@ -83,16 +91,18 @@ if [ ! -d /var/lib/solace ]; then
     fi
   done
   if [ ${LOOP_COUNT} == 3 ]; then
-    echo "`date` ERROR: Failed to download initial install script exiting"
+    echo "`date` ERROR: Failed to download initial install script, exiting"
     exit 1
   fi
   chmod +x /var/lib/solace/vmr-install.sh
   /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
 fi
+iptables-restore < /mnt/stateful_partition/var_overlay/lib/iptables/rules.v4
+fi
 ```
 * If you are configuring 3 HA nodes, expand the the Network tab to edit the Network interface panel and customise your IP addresses. You need to pick 3 available IPs (same as you configure in your start-up script)
 
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_launch_3.png "GCE Image creation 3")
+![alt text](https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/images/gce_launch_3.png "GCE Image creation 3")
 
 
 Now hit the "Create" button on the bottom of this page or add some VMR config keys before you do.
