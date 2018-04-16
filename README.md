@@ -98,7 +98,6 @@ if [ ! -d /var/lib/solace ]; then
   /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
 fi
 iptables-restore < /mnt/stateful_partition/var_overlay/lib/iptables/rules.v4
-fi
 ```
 * If you are configuring 3 HA nodes, expand the the Network tab to edit the Network interface panel and customise your IP addresses. You need to pick 3 available IPs (same as you configure in your start-up script)
 
