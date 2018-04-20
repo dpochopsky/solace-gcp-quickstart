@@ -95,7 +95,7 @@ if [ ! -d /var/lib/solace ]; then
     exit 1
   fi
   chmod +x /var/lib/solace/vmr-install.sh
-  /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
+  bash /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
 fi
 iptables-restore < /mnt/stateful_partition/var_overlay/lib/iptables/rules.v4
 ```
