@@ -78,7 +78,7 @@ tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
   ExecStart=
   ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
-echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d`" &>> ${LOG_FILE}
+echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d/docker.conf`" &>> ${LOG_FILE}
 
 systemctl enable docker &>> ${LOG_FILE}
 systemctl start docker &>> ${LOG_FILE}
@@ -138,6 +138,7 @@ fi
 echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
 # -------------------------------------------------------------
 VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
+echo "VMR version retrieved is: ${VMR_VERSION}"
 
 SOLACE_CLOUD_INIT="--env SERVICE_SSH_PORT=2222"
 [ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_globalaccesslevel=${USERNAME}"
@@ -214,6 +215,6 @@ iptables -w -A INPUT -p tcp -m tcp --dport 8741 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8300 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8301 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8302 -j ACCEPT
-iptables-save > /mnt/stateful_partition/var_overlay/lib/iptables/rules.v4
+iptables-save > /var/lib/iptables/rules.v4
 
 echo "`date` INFO: Install is complete"
