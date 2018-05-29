@@ -177,7 +177,7 @@ docker create \
    -v adbBackup:/usr/sw/adb \
    -v softAdb:/usr/sw/internalSpool/softAdb \
    ${SOLACE_CLOUD_INIT} \
-   --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
+   --name=solace solace-pubsub-standard:${VMR_VERSION} &>> ${LOG_FILE}
 
 docker ps -a &>> ${LOG_FILE}
 
