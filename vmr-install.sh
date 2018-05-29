@@ -70,29 +70,6 @@ else
       echo "`date` INFO: VMR URL is ${URL}" &>> ${LOG_FILE}
 fi
 
-
-#echo "`date` INFO:Get repositories up to date" &>> ${LOG_FILE}
-# ---------------------------------------
-
-#yum -y update &>> ${LOG_FILE}
-#yum -y install lvm2 &>> ${LOG_FILE}
-
-#echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
-# -----------------------------------
-#tee /etc/yum.repos.d/docker.repo <<-EOF
-#[dockerrepo]
-#name=Docker Repository
-#baseurl=https://yum.dockerproject.org/repo/main/centos/7/
-#enabled=1
-#gpgcheck=1
-#gpgkey=https://yum.dockerproject.org/gpg
-#EOF
-#echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  &>> ${LOG_FILE}
-
-#echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
-# -------------------------
-#yum -y install docker-engine &>> ${LOG_FILE}
-
 echo "`date` INFO:Configure Docker as a service" &>> ${LOG_FILE}
 # ----------------------------------------
 mkdir /etc/systemd/system/docker.service.d &>> install.log
@@ -124,25 +101,25 @@ fi
 echo "`date` Pre-Define Solace required infrastructure" &>> ${LOG_FILE}
 # -----------------------------------------------------
 docker volume create --name=jail \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/sda9 &>> ${LOG_FILE}
 docker volume create --name=var \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/sda9 &>> ${LOG_FILE}
 docker volume create --name=internalSpool \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/sda9 &>> ${LOG_FILE}
 docker volume create --name=adbBackup \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/sda9 &>> ${LOG_FILE}
 docker volume create --name=softAdb \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/sda9 &>> ${LOG_FILE}
 
 echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
 # ------------------------------------------------
-wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
-REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
+#wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
+#REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
 
 if [ ! -f /tmp/soltr-docker.tar.gz ]; then
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
-    wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
+    wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${URL}
     if [ 0 != `echo $?` ]; then
       ((LOOP_COUNT++))
     else

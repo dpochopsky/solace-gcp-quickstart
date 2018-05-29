@@ -5,9 +5,9 @@ The Solace Virtual Message Router (VMR) provides enterprise-grade messaging capa
 # How to Deploy a VMR
 This is a 3 step process:
 
-* Go to the Solace Developer portal and request a Solace Community edition VMR (or the Evaluation edition, if you want to set-up an HA group). This process will return an email with a Download link. Do a right click "Copy Hyperlink" on the "Download the VMR Community Edition for Docker" (or Evaluation Edition) hyperlink.  This link is of the form "http<nolink>://em.solace.com ?" will be needed in the following section.
+* Go to the Solace Developer portal and look for the PubSub+ Standard download link for the Docker version. Do a right click "Copy Hyperlink" on the "Download the PubSub+ Standard Edition for Docker" hyperlink. This will be needed in the following section.
 
-<a href="http://dev.solace.com/downloads/download_vmr-ce-docker" target="_blank">
+<a href="https://products.solace.com/download/PUBSUB_DOCKER_STAND" target="_blank">
     <img src="https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/images/register.png"/>
     
 </a>
@@ -21,7 +21,7 @@ size of at least 30 GB depolyed on COS:
 
 ![alt text](https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/images/gce_launch_cos_2.png "GCE Image creation 2")
 
-Cut and paste the code into the panel, replace -link to VMR Docker Image- with the URL you received in step one.
+Cut and paste the code into the panel, replace -link to PubSub+ Docker Image- with the URL you received in step one.
 
 ```
 #!/bin/bash
@@ -34,9 +34,9 @@ touch /tmp/startup_script_run
 export baseroutername=cosvmr
 export vmradminpass=soladmingce
 export vmr_scaling=1000 #1000, 10000 or 100000
-#export monitor_ip=10.132.1.10
-#export primary_ip=10.132.1.11
-#export backup_ip=10.132.1.12
+#export monitor_ip=${baseroutername}0
+#export primary_ip=${baseroutername}1
+#export backup_ip=${baseroutername}2
 #export redundancy_enable=yes
 #export redundancy_group_password=mysolgrouppass
 ##General section - no editing required
@@ -95,7 +95,7 @@ if [ ! -d /var/lib/solace ]; then
     exit 1
   fi
   chmod +x /var/lib/solace/vmr-install.sh
-  bash /var/lib/solace/vmr-install.sh -i <link to VMR Docker Image> -p <SolOS/SolAdmin password>
+  bash /var/lib/solace/vmr-install.sh -i https://products.solace.com/download/PUBSUB_DOCKER_STAND -p <SolOS/SolAdmin password>
 fi
 iptables-restore < /mnt/stateful_partition/var_overlay/lib/iptables/rules.v4
 ```
