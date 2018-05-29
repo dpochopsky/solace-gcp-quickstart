@@ -152,7 +152,7 @@ echo ${SOLACE_CLOUD_INIT} | tee -a ${LOG_FILE}
 
 docker create \
    --uts=host \
-   --shm-size 3g \
+   --shm-size 4g \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
    --ulimit nofile=2448:1048576 \
