@@ -101,15 +101,15 @@ fi
 echo "`date` Pre-Define Solace required infrastructure" &>> ${LOG_FILE}
 # -----------------------------------------------------
 docker volume create --name=jail \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/datadisk &>> ${LOG_FILE}
 docker volume create --name=var \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/datadisk &>> ${LOG_FILE}
 docker volume create --name=internalSpool \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/datadisk &>> ${LOG_FILE}
 docker volume create --name=adbBackup \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/datadisk &>> ${LOG_FILE}
 docker volume create --name=softAdb \
-  --opt type=ext4 --opt device=/dev/sdb &>> ${LOG_FILE}
+  --opt type=ext4 --opt device=/dev/datadisk &>> ${LOG_FILE}
 
 echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
 # ------------------------------------------------
