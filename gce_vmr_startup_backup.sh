@@ -1,11 +1,10 @@
 #!/bin/bash
 ##Select one of the three below to configure your monitor/primary/backup node
-touch /startup-run
 #export vmr_role=monitor
 #export vmr_role=primary
 export vmr_role=backup
 ##General section - edit as required
-export baseroutername=cosvmr
+export baseroutername=centosvmr
 export vmradminpass=soladmingce
 export vmr_scaling=10000 #1000, 10000 or 100000
 export monitor_ip=${baseroutername}0
@@ -57,10 +56,11 @@ if [ ! -d /var/lib/solace ]; then
   echo "creating directory..."
   mkdir /var/lib/solace
   cd /var/lib/solace
+  yum install -y wget
   LOOP_COUNT=0
   echo "downloading VMR install script..."
   while [ $LOOP_COUNT -lt 3 ]; do
-    wget https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/container-optimized-os/vmr-install.sh
+    wget https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/centos/vmr-install.sh
     if [ 0 != `echo $?` ]; then
       ((LOOP_COUNT++))
     else

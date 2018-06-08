@@ -1,5 +1,4 @@
 #!/bin/bash
-
 URL=""
 USERNAME=admin
 PASSWORD=admin
