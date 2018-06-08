@@ -32,7 +32,7 @@ for index in 0 1 2; do
     gcloud compute instances create ${name} \
     --boot-disk-size=${bootdisksize} \
     --boot-disk-type=pd-standard \
-    --labels="creator=choltfurth,usage=cos-testing,customer=hsbc" \
+    --labels="usage=solace-vmr-cos" \
     --machine-type=${machinetype} \
     --zone=europe-west1-b \
     --disk="name=${datadisk},device-name=sdb,auto-delete=yes,mode=rw" \
