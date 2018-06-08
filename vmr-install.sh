@@ -69,6 +69,28 @@ else
       echo "`date` INFO: VMR URL is ${URL}" | tee -a ${LOG_FILE}
 fi
 
+echo "`date` INFO:Get repositories up to date" &>> ${LOG_FILE}
+# ---------------------------------------
+
+yum -y update &>> ${LOG_FILE}
+yum -y install lvm2 &>> ${LOG_FILE}
+
+echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
+# -----------------------------------
+tee /etc/yum.repos.d/docker.repo <<-EOF
+[dockerrepo]
+name=Docker Repository
+baseurl=https://yum.dockerproject.org/repo/main/centos/7/
+enabled=1
+gpgcheck=1
+gpgkey=https://yum.dockerproject.org/gpg
+EOF
+echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  &>> ${LOG_FILE}
+
+echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
+# -------------------------
+yum -y install docker-engine &>> ${LOG_FILE}
+
 echo "`date` INFO:Configure Docker as a service" | tee -a ${LOG_FILE}
 # ----------------------------------------
 if [ ! -d /etc/systemd/system/docker.service.d ]; then
