@@ -160,7 +160,6 @@ docker create \
    --shm-size 2g \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
-   --ulimit nofile=2448:3145728 \
    --publish 80:80 \
    --publish 443:443 \
    --publish 8080:8080 \
@@ -184,6 +183,7 @@ docker create \
    ${SOLACE_CLOUD_INIT} \
    --name=solace solace-pubsub-standard:${VMR_VERSION} | tee -a ${LOG_FILE}
 
+#
 docker ps -a | tee -a ${LOG_FILE}
 
 echo "`date` INFO:Construct systemd for VMR" | tee -a ${LOG_FILE}
