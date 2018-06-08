@@ -122,20 +122,20 @@ else
 fi
 
 echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
-sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
+sudo mkfs.xfs -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
 
 echo "`date` Pre-Define Solace required infrastructure" | tee -a ${LOG_FILE}
 # -----------------------------------------------------
 docker volume create --name=jail \
-  --opt type=ext4 --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=var \
-  --opt type=ext4 --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=internalSpool \
-  --opt type=ext4 --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=adbBackup \
-  --opt type=ext4 --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=softAdb \
-  --opt type=ext4 --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
 
 echo "`date` INFO:Get and load the Solace Docker url" | tee -a ${LOG_FILE}
 # ------------------------------------------------
