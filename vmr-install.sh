@@ -122,7 +122,7 @@ else
 fi
 
 echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
-sudo mkfs.xfs -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
+sudo mkfs.xfs /dev/sdb
 
 echo "`date` Pre-Define Solace required infrastructure" | tee -a ${LOG_FILE}
 # -----------------------------------------------------
