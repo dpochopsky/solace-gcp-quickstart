@@ -100,6 +100,9 @@ else
    echo "`date` INFO: Memory size is ${MEM_SIZE}" | tee -a ${LOG_FILE}
 fi
 
+echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
+sudo mkfs.ext4 -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
+
 echo "`date` Pre-Define Solace required infrastructure" | tee -a ${LOG_FILE}
 # -----------------------------------------------------
 docker volume create --name=jail \
