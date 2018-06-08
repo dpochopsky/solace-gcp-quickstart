@@ -24,7 +24,7 @@ for index in 0 1 2; do
 
     gcloud compute disks create ${datadisk} \
     --description="Data disk for VMR ${name}" \
-    --labels="creator=choltfurth,usage=perftesting,customer=hsbc" \
+    --labels="usage=solace-vmr-cos" \
     --size=${datadisksize} \
     --type=pd-ssd \
     --zone=europe-west1-b
