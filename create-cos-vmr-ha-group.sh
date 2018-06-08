@@ -1,6 +1,5 @@
 #!/bin/bash
 basename=cosvmr
-if [[ $# > 0 ]]; then
 for index in 0 1 2; do
   name=${basename}${index}
   if [ "${index}" == "0" ]; then
@@ -41,7 +40,7 @@ for index in 0 1 2; do
     --image-project=coreos-cloud
 done
 sleep 60
-fi
+
 for index in 0 1 2; do
   name=${basename}${index}
   if [ "${index}" == "0" ]; then
