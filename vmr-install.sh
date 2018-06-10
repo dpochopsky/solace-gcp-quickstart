@@ -5,6 +5,7 @@ PASSWORD=admin
 LOG_FILE=install.log
 SWAP_FILE=swap
 SOLACE_HOME=`pwd`
+fstype=ext4
 #cloud init vars
 #array of all available cloud init variables to attempt to detect and pass to docker image creation
 #see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm
@@ -122,18 +123,18 @@ else
 fi
 
 echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
-sudo mkfs.xfs /dev/sdb
+sudo mkfs.${fxtype} /dev/sdb
 
 echo "`date` Pre-Define Solace required infrastructure" | tee -a ${LOG_FILE}
 # -----------------------------------------------------
 docker volume create --name=jail \
-  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=var \
-  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=internalSpool \
-  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=adbBackup \
-  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=softAdb \
   --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
 
