@@ -1,5 +1,6 @@
 #!/bin/bash
 basename=cosvmr
+if [ $# > 0 ]; then
 for index in 0 1 2; do
   name=${basename}${index}
   if [ "${index}" == "0" ]; then
@@ -7,16 +8,16 @@ for index in 0 1 2; do
     bootdisksize=50GB
     machinetype="n1-standard-2"
     datadisk="${name}-datadisk"
-    datadisksize=10GB
+    datadisksize=100GB
   elif [ "${index}" == "1" ]; then
     startupscript="gce_vmr_startup_primary.sh"
-    bootdisksize=1000GB
+    bootdisksize=500GB
     machinetype="n1-standard-8"
     datadisk="${name}-datadisk"
     datadisksize=1000GB
   else
     startupscript="gce_vmr_startup_backup.sh"
-    bootdisksize=1000GB
+    bootdisksize=500GB
     machinetype="n1-standard-8"
     datadisk="${name}-datadisk"
     datadisksize=1000GB
@@ -31,16 +32,16 @@ for index in 0 1 2; do
 
     gcloud compute instances create ${name} \
     --boot-disk-size=${bootdisksize} \
-    --boot-disk-type=pd-standard \
+    --boot-disk-type=pd-ssd \
     --labels="usage=solace-vmr-cos" \
     --machine-type=${machinetype} \
     --zone=europe-west1-b \
     --disk="name=${datadisk},device-name=sdb,auto-delete=yes,mode=rw" \
-    --image-family=coreos-stable \
-    --image-project=coreos-cloud
+    --image-family=cos-stable \
+    --image-project=cos-cloud
 done
 sleep 60
-
+fi
 for index in 0 1 2; do
   name=${basename}${index}
   if [ "${index}" == "0" ]; then
@@ -51,5 +52,5 @@ for index in 0 1 2; do
     startupscript="gce_vmr_startup_backup.sh"
   fi
   gcloud compute scp ${startupscript} ${name}:~/install-vmr.sh
-  gcloud compute ssh ${name} --command="sudo ~/install-vmr.sh"
+  gcloud compute ssh ${name} --command="sudo bash ~/install-vmr.sh"
 done
