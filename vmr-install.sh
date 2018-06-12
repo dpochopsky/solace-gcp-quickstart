@@ -143,12 +143,10 @@ docker volume create --name=internalSpool \
 docker volume create --name=adbBackup \
   --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=softAdb \
-  --opt type=xfs --opt device=/dev/sdb | tee -a ${LOG_FILE}
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 
 echo "`date` INFO:Get and load the Solace Docker url" | tee -a ${LOG_FILE}
 # ------------------------------------------------
-#wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
-#REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
 
 if [ ! -f /tmp/soltr-docker.tar.gz ]; then
   LOOP_COUNT=0
