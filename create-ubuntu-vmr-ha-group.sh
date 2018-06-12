@@ -9,7 +9,7 @@ for index in 0 1 2; do
     datadisk="${name}-datadisk"
     datadisksize=100GB
   elif [ "${index}" == "1" ]; then
-    startupscript="test.sh"
+    startupscript="gce_vmr_startup_primary.sh"
     bootdisksize=500GB
     machinetype="n1-standard-8"
     datadisk="${name}-datadisk"
