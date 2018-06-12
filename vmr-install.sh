@@ -123,7 +123,7 @@ else
 fi
 
 echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
-sudo mkfs.${fstype} /dev/sdb
+sudo mkfs.${fstype} -f /dev/sdb
 
 echo "`date` Pre-Define Solace required infrastructure" | tee -a ${LOG_FILE}
 # -----------------------------------------------------

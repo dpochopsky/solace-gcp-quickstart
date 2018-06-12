@@ -26,7 +26,5 @@ gcloud compute instances create ${name} \
 
 sleep 60
 
-name=${basename}
-startupscript="gce_vmr_startup_singleton.sh"
 gcloud compute scp ${startupscript} ${name}:~/install-vmr.sh
 gcloud compute ssh ${name} --command="sudo ~/install-vmr.sh"
