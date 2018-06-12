@@ -70,39 +70,18 @@ else
       echo "`date` INFO: VMR URL is ${URL}" | tee -a ${LOG_FILE}
 fi
 
-echo "`date` INFO:Get repositories up to date" &>> ${LOG_FILE}
+echo "`date` INFO:Get repositories up to date" | tee -a ${LOG_FILE}
 # ---------------------------------------
 
-apt-get -y update &>> ${LOG_FILE}
-apt-get -y install lvm2 &>> ${LOG_FILE}
+apt-get -y update | tee -a ${LOG_FILE}
+apt-get -y install lvm2 | tee -a ${LOG_FILE}
 
-echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
-# -----------------------------------
-tee /etc/yum.repos.d/docker.repo <<-EOF
-[dockerrepo]
-name=Docker Repository
-baseurl=https://yum.dockerproject.org/repo/main/centos/7/
-enabled=1
-gpgcheck=1
-gpgkey=https://yum.dockerproject.org/gpg
-EOF
-echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  &>> ${LOG_FILE}
-
-echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
+echo "`date` INFO:Intall Docker" | tee -a ${LOG_FILE}
 # -------------------------
-yum -y install docker-engine &>> ${LOG_FILE}
-
-echo "`date` INFO:Configure Docker as a service" | tee -a ${LOG_FILE}
-# ----------------------------------------
-if [ ! -d /etc/systemd/system/docker.service.d ]; then
-  mkdir /etc/systemd/system/docker.service.d | tee -a install.log
-  tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
-[Service]
-  ExecStart=
-  ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
-EOF
-fi
-echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d/docker.conf`" | tee -a ${LOG_FILE}
+apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D | tee -a ${LOG_FILE}
+deb https://apt.dockerproject.org/repo ubuntu-xenial main | tee -a ${LOG_FILE}
+apt-get install linux-image-extra-$(uname -r) linux-image-extra-virtual | tee -a ${LOG_FILE}
+apt-get install docker-engine | tee -a ${LOG_FILE}
 
 systemctl enable docker | tee -a ${LOG_FILE}
 systemctl start docker | tee -a ${LOG_FILE}
@@ -124,9 +103,9 @@ fi
 
 echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
 if [ "${fstype}" == "xfs" ]; then
-  sudo mkfs.${fstype} -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
+  sudo mkfs.${fstype} -f /dev/sdb
 elif [ "${fstype}" == "ext4" ]; then
-  sudo mkfs.${fstype} /dev/sdb
+  sudo mkfs.${fstype} -f /dev/sdb
 else
   echo "unsupported fstype"
   exit -1
@@ -147,9 +126,6 @@ docker volume create --name=softAdb \
 
 echo "`date` INFO:Get and load the Solace Docker url" | tee -a ${LOG_FILE}
 # ------------------------------------------------
-#wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
-#REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
-
 if [ ! -f /tmp/soltr-docker.tar.gz ]; then
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
