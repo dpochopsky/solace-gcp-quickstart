@@ -119,9 +119,6 @@ docker volume create --name=softAdb \
 
 echo "`date` INFO:Get and load the Solace Docker url" | tee -a ${LOG_FILE}
 # ------------------------------------------------
-#wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
-#REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
-
 if [ ! -f /tmp/soltr-docker.tar.gz ]; then
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
@@ -143,8 +140,9 @@ fi
 
 echo "`date` INFO:Create a Docker instance from Solace Docker image" | tee -a ${LOG_FILE}
 # -------------------------------------------------------------
-VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
 VMR_TYPE=`docker images | grep solace | awk '{print $1}'`
+VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
+echo "VMR image retrieved is: ${VMR_TYPE}"
 echo "VMR version retrieved is: ${VMR_VERSION}"
 
 SOLACE_CLOUD_INIT="--env SERVICE_SSH_PORT=2222"
@@ -183,7 +181,7 @@ docker create \
    -v adbBackup:/usr/sw/adb \
    -v softAdb:/usr/sw/internalSpool/softAdb \
    ${SOLACE_CLOUD_INIT} \
-   --name=${VMR_TYPE}:${VMR_VERSION} | tee -a ${LOG_FILE}
+   --name=solace ${VMR_TYPE}:${VMR_VERSION} | tee -a ${LOG_FILE}
 
 #
 docker ps -a | tee -a ${LOG_FILE}
