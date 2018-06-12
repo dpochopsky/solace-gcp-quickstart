@@ -60,7 +60,7 @@ if [ ! -d /var/lib/solace ]; then
   LOOP_COUNT=0
   echo "downloading VMR install script..."
   while [ $LOOP_COUNT -lt 3 ]; do
-    wget https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/centos/vmr-install.sh
+    wget https://raw.githubusercontent.com/ChristianHoltfurth/solace-gcp-quickstart/ubuntu/vmr-install.sh
     if [ 0 != `echo $?` ]; then
       ((LOOP_COUNT++))
     else
