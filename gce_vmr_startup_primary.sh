@@ -73,5 +73,5 @@ if [ ! -d /var/lib/solace ]; then
     exit 1
   fi
   chmod +x /var/lib/solace/vmr-install.sh
-  bash /var/lib/solace/vmr-install.sh -i https://products.solace.com/download/PUBSUB_DOCKER_STAND -p ${vmradminpass}
+  bash /var/lib/solace/vmr-install.sh -i https://products.solace.com/download/PUBSUB_DOCKER_EVAL -p ${vmradminpass}
 fi
