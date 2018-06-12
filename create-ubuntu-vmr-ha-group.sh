@@ -1,5 +1,5 @@
 #!/bin/bash
-basename=centosvmr
+basename=ubuntuvmr
 for index in 0 1 2; do
   name=${basename}${index}
   if [ "${index}" == "0" ]; then
@@ -36,8 +36,8 @@ for index in 0 1 2; do
     --machine-type=${machinetype} \
     --zone=europe-west1-b \
     --disk="name=${datadisk},device-name=sdb,auto-delete=yes,mode=rw" \
-    --image-project=centos-cloud \
-    --image-family=centos-7
+    --image-family=ubuntu-1604-lts \
+    --image-project=ubuntu-os-cloud
 done
 sleep 60
 

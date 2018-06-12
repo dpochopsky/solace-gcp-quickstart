@@ -73,8 +73,8 @@ fi
 echo "`date` INFO:Get repositories up to date" &>> ${LOG_FILE}
 # ---------------------------------------
 
-yum -y update &>> ${LOG_FILE}
-yum -y install lvm2 &>> ${LOG_FILE}
+apt-get -y update &>> ${LOG_FILE}
+apt-get -y install lvm2 &>> ${LOG_FILE}
 
 echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
 # -----------------------------------

@@ -5,7 +5,7 @@ echo "start-up script triggered..."
 export vmr_role=primary
 #export vmr_role=backup
 ##General section - edit as required
-export baseroutername=centosvmr
+export baseroutername=ubuntuvmr
 export vmradminpass=soladmingce
 export vmr_scaling=10000 #1000, 10000 or 100000
 export monitor_ip=${baseroutername}0
@@ -57,7 +57,7 @@ if [ ! -d /var/lib/solace ]; then
   echo "creating directory..."
   mkdir /var/lib/solace
   cd /var/lib/solace
-  yum install -y wget
+  apt-get install -y wget
   LOOP_COUNT=0
   echo "downloading VMR install script..."
   while [ $LOOP_COUNT -lt 3 ]; do
