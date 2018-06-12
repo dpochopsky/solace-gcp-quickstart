@@ -247,6 +247,5 @@ iptables -w -A INPUT -p tcp -m tcp --dport 8741 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8300 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8301 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8302 -j ACCEPT
-iptables-save > /var/lib/iptables/rules.v4
 
 echo "`date` INFO: Install is complete"
