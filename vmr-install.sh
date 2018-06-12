@@ -123,7 +123,14 @@ else
 fi
 
 echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
-sudo mkfs.${fxtype} /dev/sdb
+if [ "${fstype}" == "xfs" ]; then
+  sudo mkfs.${fstype} -m 0 -F -E lazy_itable_init=0,lazy_journal_init=0,discard /dev/sdb
+elif [ "${fstype}" == "ext4" ]; then
+  sudo mkfs.${fstype} /dev/sdb
+else
+  echo "unsupported fstype"
+  exit -1
+fi
 
 echo "`date` Pre-Define Solace required infrastructure" | tee -a ${LOG_FILE}
 # -----------------------------------------------------
