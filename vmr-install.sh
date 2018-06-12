@@ -183,7 +183,7 @@ docker create \
    -v adbBackup:/usr/sw/adb \
    -v softAdb:/usr/sw/internalSpool/softAdb \
    ${SOLACE_CLOUD_INIT} \
-   --name=${ VMR_TYPE}:${VMR_VERSION} | tee -a ${LOG_FILE}
+   --name=${VMR_TYPE}:${VMR_VERSION} | tee -a ${LOG_FILE}
 
 #
 docker ps -a | tee -a ${LOG_FILE}
