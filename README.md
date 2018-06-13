@@ -10,7 +10,7 @@ See https://cloud.google.com/sdk/
 
 * Clone this project, edit the gce_vmr_startup... scripts as appropriate to change passwords and run either the `create-ubuntu-vmr-singleton.sh` for a standalone VMR or `create-ubuntu-vmr-ha-group.sh` script for a full HA 
 triplet with built-in redundancy.
-This will create 1 or two GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ evaluation version on those nodes.
+This will create one or three GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ evaluation version on those nodes.
 
 # Set up network security to allow acces
 
