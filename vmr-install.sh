@@ -1,11 +1,11 @@
 #!/bin/bash
-
 URL=""
 USERNAME=admin
 PASSWORD=admin
 LOG_FILE=install.log
 SWAP_FILE=swap
 SOLACE_HOME=`pwd`
+fstype=xfs
 #cloud init vars
 #array of all available cloud init variables to attempt to detect and pass to docker image creation
 #see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm
@@ -60,16 +60,15 @@ do
   shift # past argument or value
 done
 
-echo "`date` INFO: Validate we have been passed a VMR url" &>> ${LOG_FILE}
+echo "`date` INFO: Validate we have been passed a VMR url" | tee -a ${LOG_FILE}
 # -----------------------------------------------------
 if [ -z "$URL" ]
 then
-      echo "USAGE: vmr-install.sh --url <Solace Docker URL>" &>> ${LOG_FILE}
+      echo "USAGE: vmr-install.sh --url <Solace Docker URL>" | tee -a ${LOG_FILE}
       exit 1
 else
-      echo "`date` INFO: VMR URL is ${URL}" &>> ${LOG_FILE}
+      echo "`date` INFO: VMR URL is ${URL}" | tee -a ${LOG_FILE}
 fi
-
 
 echo "`date` INFO:Get repositories up to date" &>> ${LOG_FILE}
 # ---------------------------------------
@@ -93,44 +92,59 @@ echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
 # -------------------------
 yum -y install docker-engine &>> ${LOG_FILE}
 
-echo "`date` INFO:Configure Docker as a service" &>> ${LOG_FILE}
+echo "`date` INFO:Configure Docker as a service" | tee -a ${LOG_FILE}
 # ----------------------------------------
-mkdir /etc/systemd/system/docker.service.d &>> install.log
-tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
+if [ ! -d /etc/systemd/system/docker.service.d ]; then
+  mkdir /etc/systemd/system/docker.service.d | tee -a install.log
+  tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
 [Service]
   ExecStart=
   ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
-echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d`" &>> ${LOG_FILE}
+fi
+echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d/docker.conf`" | tee -a ${LOG_FILE}
 
-systemctl enable docker &>> ${LOG_FILE}
-systemctl start docker &>> ${LOG_FILE}
+systemctl enable docker | tee -a ${LOG_FILE}
+systemctl start docker | tee -a ${LOG_FILE}
 
-echo "`date` INFO:Set up swap for < 6GB machines" &>> ${LOG_FILE}
+echo "`date` INFO:Set up swap for < 6GB machines" | tee -a ${LOG_FILE}
 # -----------------------------------------
-MEM_SIZE=`cat /proc/meminfo | grep MemTotal | tr -dc '0-9'` &>> ${LOG_FILE}
+MEM_SIZE=`cat /proc/meminfo | grep MemTotal | tr -dc '0-9'` | tee -a ${LOG_FILE}
 if [ ${MEM_SIZE} -lt 6087960 ]; then
-  echo "`date` WARN: Not enough memory: ${MEM_SIZE} Creating 2GB Swap space" &>> ${LOG_FILE}
-  mkdir /var/lib/solace &>> ${LOG_FILE}
-  dd if=/dev/zero of=/var/lib/solace/swap count=2048 bs=1MiB &>> ${LOG_FILE}
-  mkswap -f /var/lib/solace/swap &>> ${LOG_FILE}
-  chmod 0600 /var/lib/solace/swap &>> ${LOG_FILE}
-  swapon -f /var/lib/solace/swap &>> ${LOG_FILE}
-  grep -q 'solace\/swap' /etc/fstab || sudo sh -c 'echo "/var/lib/solace/swap none swap sw 0 0" >> /etc/fstab' &>> ${LOG_FILE}
+  echo "`date` WARN: Not enough memory: ${MEM_SIZE} Creating 2GB Swap space" | tee -a ${LOG_FILE}
+  mkdir /var/lib/solace | tee -a ${LOG_FILE}
+  dd if=/dev/zero of=/var/lib/solace/swap count=2048 bs=1MiB | tee -a ${LOG_FILE}
+  mkswap -f /var/lib/solace/swap | tee -a ${LOG_FILE}
+  chmod 0600 /var/lib/solace/swap | tee -a ${LOG_FILE}
+  swapon -f /var/lib/solace/swap | tee -a ${LOG_FILE}
+  grep -q 'solace\/swap' /etc/fstab || sudo sh -c 'echo "/var/lib/solace/swap none swap sw 0 0" >> /etc/fstab' | tee -a ${LOG_FILE}
 else
-   echo "`date` INFO: Memory size is ${MEM_SIZE}" &>> ${LOG_FILE}
+   echo "`date` INFO: Memory size is ${MEM_SIZE}" | tee -a ${LOG_FILE}
 fi
 
+echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
+sudo mkfs.${fstype} -q /dev/sdb
 
-echo "`date` INFO:Get and load the Solace Docker url" &>> ${LOG_FILE}
+echo "`date` Pre-Define Solace required infrastructure" | tee -a ${LOG_FILE}
+# -----------------------------------------------------
+docker volume create --name=jail \
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
+docker volume create --name=var \
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
+docker volume create --name=internalSpool \
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
+docker volume create --name=adbBackup \
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
+docker volume create --name=softAdb \
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
+
+echo "`date` INFO:Get and load the Solace Docker url" | tee -a ${LOG_FILE}
 # ------------------------------------------------
-wget -O /tmp/redirect.html -nv -a ${LOG_FILE} ${URL}
-REAL_HTML=`egrep -o "https://[a-zA-Z0-9\.\/\_\?\=]*" /tmp/redirect.html`
 
 if [ ! -f /tmp/soltr-docker.tar.gz ]; then
   LOOP_COUNT=0
   while [ $LOOP_COUNT -lt 3 ]; do
-    wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${REAL_HTML}
+    wget -O /tmp/soltr-docker.tar.gz -nv -a ${LOG_FILE} ${URL}
     if [ 0 != `echo $?` ]; then
       ((LOOP_COUNT++))
     else
@@ -142,13 +156,16 @@ if [ ! -f /tmp/soltr-docker.tar.gz ]; then
     exit 1
   fi
 
-  docker load -i /tmp/soltr-docker.tar.gz &>> ${LOG_FILE}
-  docker images &>> ${LOG_FILE}
+  docker load -i /tmp/soltr-docker.tar.gz | tee -a ${LOG_FILE}
+  docker images | tee -a ${LOG_FILE}
 fi
 
-echo "`date` INFO:Create a Docker instance from Solace Docker image" &>> ${LOG_FILE}
+echo "`date` INFO:Create a Docker instance from Solace Docker image" | tee -a ${LOG_FILE}
 # -------------------------------------------------------------
+VMR_TYPE=`docker images | grep solace | awk '{print $1}'`
 VMR_VERSION=`docker images | grep solace | awk '{print $2}'`
+echo "VMR image retrieved is: ${VMR_TYPE}"
+echo "VMR version retrieved is: ${VMR_VERSION}"
 
 SOLACE_CLOUD_INIT="--env SERVICE_SSH_PORT=2222"
 [ ! -z "${USERNAME}" ] && SOLACE_CLOUD_INIT=${SOLACE_CLOUD_INIT}" --env username_admin_globalaccesslevel=${USERNAME}"
@@ -165,17 +182,33 @@ docker create \
    --shm-size 2g \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
-   --ulimit nofile=2448:38048 \
+   --publish 80:80 \
+   --publish 443:443 \
+   --publish 8080:8080 \
+   --publish 9443:9443 \
+   --publish 55555:55555 \
+   --publish 55003:55003 \
+   --publish 55443:55443 \
+   --publish 8741:8741 \
+   --publish 8300:8300 \
+   --publish 8301:8301 \
+   --publish 8302:8302 \
    --cap-add=IPC_LOCK \
    --cap-add=SYS_NICE \
    --net=host \
    --restart=always \
+   -v jail:/usr/sw/jail \
+   -v var:/usr/sw/var \
+   -v internalSpool:/usr/sw/internalSpool \
+   -v adbBackup:/usr/sw/adb \
+   -v softAdb:/usr/sw/internalSpool/softAdb \
    ${SOLACE_CLOUD_INIT} \
-   --name=solace solace-app:${VMR_VERSION} &>> ${LOG_FILE}
+   --name=solace ${VMR_TYPE}:${VMR_VERSION} | tee -a ${LOG_FILE}
 
-docker ps -a &>> ${LOG_FILE}
+#
+docker ps -a | tee -a ${LOG_FILE}
 
-echo "`date` INFO:Construct systemd for VMR" &>> ${LOG_FILE}
+echo "`date` INFO:Construct systemd for VMR" | tee -a ${LOG_FILE}
 # --------------------------------------
 tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 [Unit]
@@ -189,10 +222,25 @@ tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 [Install]
   WantedBy=default.target
 EOF
-echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" &>> ${LOG_FILE}
+echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" | tee -a ${LOG_FILE}
 
 echo "`date` INFO: Start the VMR"
 # --------------------------
-systemctl daemon-reload &>> ${LOG_FILE}
-systemctl enable solace-docker-vmr &>> ${LOG_FILE}
-systemctl start solace-docker-vmr &>> ${LOG_FILE}
+systemctl daemon-reload | tee -a ${LOG_FILE}
+systemctl enable solace-docker-vmr | tee -a ${LOG_FILE}
+systemctl start solace-docker-vmr | tee -a ${LOG_FILE}
+
+echo "adding firewall rules..."
+iptables -w -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 9443 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 55555 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 55003 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 55443 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8741 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8300 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8301 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 8302 -j ACCEPT
+
+echo "`date` INFO: Install is complete"
