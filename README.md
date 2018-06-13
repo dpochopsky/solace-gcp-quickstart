@@ -9,7 +9,7 @@ This is a 2 step process:
 See https://cloud.google.com/sdk/
 
 * Clone this project, edit the gce_vmr_startup... scripts as appropriate to change passwords and run either the `create-centos-vmr-singleton.sh` for a standalone VMR or `create-centos-vmr-ha-group.sh` script for a full HA triplet with built-in redundancy.
-This will create 1 or two GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ evaluation version on those nodes.
+This will create one or three GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ evaluation version on those nodes.
 
 # Set up network security to allow access
 Now that the VMR is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
