@@ -41,7 +41,7 @@ elif [ "${vmr_role}" == "backup" ]; then
   export system_scaling_maxconnectioncount=${vmr_scaling}
   export redundancy_matelink_connectvia=${primary_ip}
 else
-  echo "invalid role selected, disabling redundancy"
+  echo "unknown role or singleton selected, disabling redundancy"
   export redundancy_enable=no
   export configsync_enable=no
   export system_scaling_maxconnectioncount=${vmr_scaling}
