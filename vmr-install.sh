@@ -5,7 +5,7 @@ PASSWORD=admin
 LOG_FILE=install.log
 SWAP_FILE=swap
 SOLACE_HOME=`pwd`
-fstype=ext4
+fstype=xfs
 #cloud init vars
 #array of all available cloud init variables to attempt to detect and pass to docker image creation
 #see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm
