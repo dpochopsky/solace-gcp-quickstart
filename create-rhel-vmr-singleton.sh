@@ -1,6 +1,6 @@
 #!/bin/bash
 os=rhel
-basename=${ os}vmr
+basename=${os}vmr
 name=${basename}
 startupscript="gce_vmr_startup_singleton.sh"
 bootdisksize=500GB
