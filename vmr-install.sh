@@ -155,11 +155,33 @@ done
 echo "SOLACE_CLOUD_INIT set to:" | tee -a ${LOG_FILE}
 echo ${SOLACE_CLOUD_INIT} | tee -a ${LOG_FILE}
 
+# Set container limits according to scaling tier requirements
+if [ ${vmr_scaling} == "100" ]; then
+  export shm_size="2g"
+  export ulimit_nofile="2448:6592" 
+elif [ ${vmr_scaling} == "1000" ]; then
+  export shm_size="2g"
+  export ulimit_nofile="2448:10192" 
+elif [ ${vmr_scaling} == "10000" ]; then
+  export shm_size="2g"
+  export ulimit_nofile="2448:42192" 
+elif [ ${vmr_scaling} == "100000" ]; then
+  export shm_size="3.3g"
+  export ulimit_nofile="2448:222192" 
+elif [ ${vmr_scaling} == "200000" ]; then
+  export shm_size="3.3g"
+  export ulimit_nofile="2448:422192" 
+else
+  export shm_size="2g"
+  export ulimit_nofile="2448:6592" 
+fi
+
 docker create \
    --uts=host \
-   --shm-size 2g \
+   --shm-size ${shm_size} \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
+   --ulimit nofile=${ulimit_nofile} \
    --publish 80:80 \
    --publish 443:443 \
    --publish 8080:8080 \
