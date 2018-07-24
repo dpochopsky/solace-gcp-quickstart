@@ -216,6 +216,7 @@ docker create \
    --publish 8300:8300 \
    --publish 8301:8301 \
    --publish 8302:8302 \
+   --publish 8302:8302 \
    --cap-add=IPC_LOCK \
    --cap-add=SYS_NICE \
    --net=host \
@@ -265,5 +266,6 @@ iptables -w -A INPUT -p tcp -m tcp --dport 8741 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8300 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8301 -j ACCEPT
 iptables -w -A INPUT -p tcp -m tcp --dport 8302 -j ACCEPT
+iptables -w -A INPUT -p tcp -m tcp --dport 5550 -j ACCEPT
 
 echo "`date` INFO: Install is complete"
