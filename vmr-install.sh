@@ -110,7 +110,7 @@ systemctl start docker | tee -a ${LOG_FILE}
 
 echo "`date` INFO:Set up swap for < 6GB machines" | tee -a ${LOG_FILE}
 # -----------------------------------------
-MEM_SIZE=`cat /proc/meminfo | grep MemTotal | tr -dc '0-9'` | tee -a ${LOG_FILE}
+MEM_SIZE=$(cat /proc/meminfo | grep MemTotal | tr -dc '0-9')
 if [ ${MEM_SIZE} -lt 6087960 ]; then
   echo "`date` WARN: Not enough memory: ${MEM_SIZE} Creating 2GB Swap space" | tee -a ${LOG_FILE}
   mkdir /var/lib/solace | tee -a ${LOG_FILE}
@@ -205,18 +205,18 @@ docker create \
    --ulimit core=-1 \
    --ulimit memlock=-1 \
    --ulimit nofile=${ulimit_nofile} \
-   --publish 80:80 \
-   --publish 443:443 \
-   --publish 8080:8080 \
-   --publish 9443:9443 \
-   --publish 55555:55555 \
-   --publish 55003:55003 \
-   --publish 55443:55443 \
-   --publish 8741:8741 \
-   --publish 8300:8300 \
-   --publish 8301:8301 \
-   --publish 8302:8302 \
-   --publish 8302:8302 \
+#   --publish 80:80 \
+#   --publish 443:443 \
+#   --publish 8080:8080 \
+#   --publish 9443:9443 \
+#   --publish 55555:55555 \
+#   --publish 55003:55003 \
+#   --publish 55443:55443 \
+#   --publish 8741:8741 \
+#   --publish 8300:8300 \
+#   --publish 8301:8301 \
+#   --publish 8302:8302 \
+#   --publish 8302:8302 \
    --cap-add=IPC_LOCK \
    --cap-add=SYS_NICE \
    --net=host \
@@ -254,18 +254,18 @@ systemctl daemon-reload | tee -a ${LOG_FILE}
 systemctl enable solace-docker-vmr | tee -a ${LOG_FILE}
 systemctl start solace-docker-vmr | tee -a ${LOG_FILE}
 
-echo "adding firewall rules..."
-iptables -w -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 9443 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 55555 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 55003 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 55443 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 8741 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 8300 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 8301 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 8302 -j ACCEPT
-iptables -w -A INPUT -p tcp -m tcp --dport 5550 -j ACCEPT
+#echo "adding firewall rules..."
+#iptables -w -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 8080 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 9443 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 55555 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 55003 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 55443 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 8741 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 8300 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 8301 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 8302 -j ACCEPT
+#iptables -w -A INPUT -p tcp -m tcp --dport 5550 -j ACCEPT
 
 echo "`date` INFO: Install is complete"
