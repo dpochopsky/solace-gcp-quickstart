@@ -259,7 +259,7 @@ echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/sy
 #
 # Setup proper core file management
 #
-sysctl -p /etc/sysctl.d/core-pattern.conf
+#sysctl -p /etc/sysctl.d/core-pattern.conf
 
 #
 # Setup the TCP buffer limits for connection scaling
