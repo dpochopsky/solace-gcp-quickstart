@@ -53,14 +53,17 @@ else
       echo "`date` INFO: VMR URL is ${URL}" | tee -a ${LOG_FILE}
 fi
 
-echo "`date` INFO:Get repositories up to date" &>> ${LOG_FILE}
-yum -y update &>> ${LOG_FILE}
-yum -y install lvm2 &>> ${LOG_FILE}
+#
+# Perform an update
+#
+echo "`date` INFO:Get repositories up to date" | tee -a ${LOG_FILE}
+yum -y update 
+yum -y install lvm2
 
 #
 # Create docker repository
 #
-echo "`date` INFO:Set up Docker Repository" &>> ${LOG_FILE}
+echo "`date` INFO:Set up Docker Repository" | tee -a ${LOG_FILE}
 # -----------------------------------
 tee /etc/yum.repos.d/docker.repo <<-EOF
 [dockerrepo]
@@ -70,11 +73,11 @@ enabled=1
 gpgcheck=1
 gpgkey=https://yum.dockerproject.org/gpg
 EOF
-echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  &>> ${LOG_FILE}
-echo "`date` INFO:Intall Docker" &>> ${LOG_FILE}
+echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  | tee -a ${LOG_FILE}
+echo "`date` INFO:Intall Docker" | tee -a ${LOG_FILE}
 
 
-yum -y install docker-engine &>> ${LOG_FILE}
+yum -y install docker-engine 
 
 #
 # Configure docker as a service & start
