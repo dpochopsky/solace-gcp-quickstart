@@ -13,26 +13,26 @@ This will create three GCE compute nodes with disks for your VMRs and download, 
 
 The `create-centos-vmr-ha-group.sh` script have a number of optional parameters that the user can define to customize their deployment:
 
-Usage:  create-centos-ha-group.sh [OPTIONS]<br/>
-OPTIONS:<br/>
-&nbsp;&nbsp;&nbsp;-n=BASENAME | --basename=BASENAME<br/>
-&nbsp;&nbsp;&nbsp;The prefix to be used for each VMRs hostname, dashes and underscores not permitted.<br/>
-&nbsp;&nbsp;&nbsp;Default:  vmr<br/>
-   -z=ZONES | --zones=ZONES<br/>
-   Comma separated list of zones for each of the VMRs, all zones must be in the same region.<br/>
-   Default:  us-east1-b us-east1-c us-east1-d<br/>
-   -c=CONNECTIONS | --connectionscale=CONNECTIONS<br/>
-   VMR connection scaling size (100, 1000, 10000, 100000, 200000).<br/>
-   Default:  1000<br/>
-   -b=BOOTDISKSIZE | --bootdisksize=BOOTDISKSIZE<br/>
-   The size of the VM boot disk, recommend 200GB or greater.<br/>
-   Default:  200GB<br/>
-   -d=DATADISKSIZE | --datadisksize=DATADISKSIZE<br/>
-   The size of the VM message spool disk, recommend 200GB or greater.<br/>
-   Default:  200GB<br/>
-   -p=ADMINPWD | --adminpassword=ADMINPWD<br/>
-   The admin password used for all VMRs.<br/>
-   Default:  admin<br/>
+**`Usage:  create-centos-ha-group.sh [OPTIONS]`<br/>**
+`OPTIONS:`<br/>
+&nbsp;&nbsp;&nbsp;`-n=BASENAME | --basename=BASENAME`<br/>
+&nbsp;&nbsp;&nbsp;`The prefix to be used for each VMRs hostname, dashes and underscores not permitted.`<br/>
+&nbsp;&nbsp;&nbsp;`Default:  vmr`<br/>
+&nbsp;&nbsp;&nbsp;`-z=ZONES | --zones=ZONES`<br/>
+&nbsp;&nbsp;&nbsp;`Comma separated list of zones for each of the VMRs, all zones must be in the same region.`<br/>
+&nbsp;&nbsp;&nbsp;`Default:  us-east1-b us-east1-c us-east1-d`<br/>
+&nbsp;&nbsp;&nbsp;`-c=CONNECTIONS | --connectionscale=CONNECTIONS`<br/>
+&nbsp;&nbsp;&nbsp;`VMR connection scaling size (100, 1000, 10000, 100000, 200000).`<br/>
+&nbsp;&nbsp;&nbsp;`Default:  1000`<br/>
+&nbsp;&nbsp;&nbsp;`-b=BOOTDISKSIZE | --bootdisksize=BOOTDISKSIZE`<br/>
+&nbsp;&nbsp;&nbsp;`The size of the VM boot disk, recommend 200GB or greater.`<br/>
+&nbsp;&nbsp;&nbsp;`Default:  200GB`<br/>
+&nbsp;&nbsp;&nbsp;`-d=DATADISKSIZE | --datadisksize=DATADISKSIZE`<br/>
+&nbsp;&nbsp;&nbsp;`The size of the VM message spool disk, recommend 200GB or greater.`<br/>
+&nbsp;&nbsp;&nbsp;`Default:  200GB`<br/>
+&nbsp;&nbsp;&nbsp;`-p=ADMINPWD | --adminpassword=ADMINPWD`<br/>
+&nbsp;&nbsp;&nbsp;`The admin password used for all VMRs.`<br/>
+&nbsp;&nbsp;&nbsp;`Default:  admin`<br/>
 
 
 # Set up network security to allow access
