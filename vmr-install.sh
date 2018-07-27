@@ -100,6 +100,7 @@ if [ ! -d /etc/systemd/system/docker.service.d ]; then
   mkdir /etc/systemd/system/docker.service.d | tee -a install.log
   tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
 [Service]
+  ExecStart=
   ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
 fi
@@ -112,7 +113,8 @@ systemctl start docker | tee -a ${LOG_FILE}
 # Setup the TCP buffer limits for connection scaling
 #
 RAM=`cat /proc/meminfo | awk '/MemTotal/ {print $2}'`
-[[ $RAM -gt 24117248 ]] && sysctl net.ipv4.tcp_mem='256000 384000 512000' &>/dev/null
+[[ $RAM -gt 24117248 ]] && sudo sysctl net.ipv4.tcp_mem='256000 384000 512000' &>/dev/null
+echo "`date` INFO: Memory size is " ${RAM} | tee -a ${LOG_FILE}
 
 
 echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
