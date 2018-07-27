@@ -13,6 +13,13 @@ This will create three GCE compute nodes with disks for your VMRs and download, 
 
 The `create-centos-vmr-ha-group.sh` script have a number of optional parameters that the user can define to customize their deployment:
 
+Usage:   create-centos-ha-group.sh [OPTIONS]
+OPTIONS:
+   n=BASENAME | --basename=BASENAME
+   The prefix to be used for each VMRs hostname, dashes and underscores not permitted.
+   
+   Default:  vmr
+
 Usage:  create-centos-ha-group.sh [OPTIONS]
 OPTIONS:
    -n=BASENAME | --basename=BASENAME
