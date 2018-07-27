@@ -220,12 +220,12 @@ docker create \
 docker ps -a | tee -a ${LOG_FILE}
 
 tee /usr/local/sbin/solace-container-exec-start-pre <<-EOF
-#! /bin/bash
+#!/bin/bash
 
 # Must port forward all packets with dest IP of the load balancer to the internal IP of VMR
 lbIP=`ip route list table local | grep "proto 66" | awk '{print $2}'`
 vmrIP=`ifconfig eth0 | grep "inet " | awk '{print $2}'`
-iptables -t nat -A PREROUTING -d ${lbIP} -j DNAT --to-destination ${vmrIP}
+iptables -t nat -A PREROUTING -d \$lbIP -j DNAT --to-destination \$vmrIP
 
 exit 0
 EOF
