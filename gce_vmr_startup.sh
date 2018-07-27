@@ -1,5 +1,5 @@
 #!/bin/bash
-##Select one of the three below to configure your monitor/primary/backup node
+
 echo "start-up script triggered..."
 
 printUsage() {
@@ -27,14 +27,11 @@ export baseroutername=$1
 export vmr_role=$2
 export vmr_scaling=$3
 export vmradminpass=$4
-
-##General section - edit as required
 export monitor_ip=${baseroutername}0
 export primary_ip=${baseroutername}1
 export backup_ip=${baseroutername}2
 export redundancy_enable=yes
 export redundancy_group_password=mysolgrouppass
-##General section - no editing required
 export redundancy_group_node_${baseroutername}0_connectvia=${monitor_ip}
 export redundancy_group_node_${baseroutername}0_nodetype=monitoring
 export redundancy_group_node_${baseroutername}1_connectvia=${primary_ip}
@@ -75,6 +72,9 @@ else
 fi
 ###
 
+#
+# Install and start the VMR installation script 
+#
 if [ ! -d /var/lib/solace ]; then
   echo "Done, starting install..."
   echo "creating directory..."
