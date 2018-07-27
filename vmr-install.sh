@@ -88,7 +88,7 @@ if [ ! -d /etc/systemd/system/docker.service.d ]; then
   tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
 [Service]
   ExecStart=
-  ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
+  ExecStart=/usr/bin/dockerd --storage-driver=devicemapper
 EOF
 fi
 echo -e "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d/docker.conf`" | tee -a ${LOG_FILE}
