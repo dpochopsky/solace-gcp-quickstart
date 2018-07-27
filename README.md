@@ -15,9 +15,9 @@ The `create-centos-vmr-ha-group.sh` script have a number of optional parameters 
 
 Usage:  create-centos-ha-group.sh [OPTIONS]<br/>
 OPTIONS:<br/>
-<hr />-n=BASENAME | --basename=BASENAME<br/>
-<hr />The prefix to be used for each VMRs hostname, dashes and underscores not permitted.<br/>
-<hr />Default:  vmr<br/>
+&nbsp;&nbsp;&nbsp;-n=BASENAME | --basename=BASENAME<br/>
+&nbsp;&nbsp;&nbsp;The prefix to be used for each VMRs hostname, dashes and underscores not permitted.<br/>
+&nbsp;&nbsp;&nbsp;Default:  vmr<br/>
    -z=ZONES | --zones=ZONES<br/>
    Comma separated list of zones for each of the VMRs, all zones must be in the same region.<br/>
    Default:  us-east1-b us-east1-c us-east1-d<br/>
