@@ -88,7 +88,7 @@ if [ ! -d /etc/systemd/system/docker.service.d ]; then
   tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
 [Service]
   ExecStart=
-  ExecStart=/usr/bin/dockerd --storage-driver=devicemapper
+  ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
 fi
 echo -e "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d/docker.conf`" | tee -a ${LOG_FILE}
@@ -231,7 +231,7 @@ tee /usr/local/sbin/solace-container-exec-start-pre <<-EOF
 # Must port forward all packets with dest IP of the load balancer to the internal IP of VMR
 lbIP=`ip route list table local | grep "proto 66" | awk '{print $2}'`
 vmrIP=`ifconfig eth0 | grep "inet " | awk '{print $2}'`
-#iptables -t nat -A PREROUTING -d \$lbIP -j DNAT --to-destination \$vmrIP
+iptables -t nat -A PREROUTING -d \$lbIP -j DNAT --to-destination \$vmrIP
 
 exit 0
 EOF
