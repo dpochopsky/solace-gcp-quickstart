@@ -73,7 +73,7 @@ enabled=1
 gpgcheck=1
 gpgkey=https://yum.dockerproject.org/gpg
 EOF
-echo "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  | tee -a ${LOG_FILE}
+echo -e "`date` INFO:/etc/yum.repos.d/docker.repo =\n `cat /etc/yum.repos.d/docker.repo`"  | tee -a ${LOG_FILE}
 echo "`date` INFO:Intall Docker" | tee -a ${LOG_FILE}
 
 
@@ -91,7 +91,7 @@ if [ ! -d /etc/systemd/system/docker.service.d ]; then
   ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
 fi
-echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d/docker.conf`" | tee -a ${LOG_FILE}
+echo -e "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/system/docker.service.d/docker.conf`" | tee -a ${LOG_FILE}
 
 systemctl enable docker | tee -a ${LOG_FILE}
 systemctl start docker | tee -a ${LOG_FILE}
@@ -254,11 +254,12 @@ tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 [Install]
   WantedBy=default.target
 EOF
-echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" | tee -a ${LOG_FILE}
+echo -e "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =\n `cat /etc/systemd/system/solace-docker-vmr.service`" | tee -a ${LOG_FILE}
 
 #
 # Setup proper core file management
 #
+# Commented out because conf file does not exist
 #sysctl -p /etc/sysctl.d/core-pattern.conf
 
 #
