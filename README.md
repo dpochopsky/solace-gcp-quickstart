@@ -2,14 +2,15 @@
 
 The Solace PubSub+ Software Broker (formerly known as VMR) provides enterprise-grade messaging capabilities deployable in any computing environment. The PubSub+ Software Broker provides the same rich feature set as Solace’s proven hardware appliances, with the same open protocol support, APIs and common management. The VMR can be deployed in the datacenter or natively within all popular private and public clouds.
 
-# How to Deploy a VMR
+# How to Deploy a VMR HA tuple
+
 This is a 2 step process:
 
 * Download and install the Google SDK on your computer
 See https://cloud.google.com/sdk/
 
 * Clone this project, run the `create-centos-vmr-ha-group.sh` script for a full HA triplet with built-in redundancy.
-This will create three GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ standard version on those nodes.  In addition, a load balancer and a default set of firewall rules will be created.
+This will create three GCE compute nodes with disks for your VMRs, then download, install and initialize the latest Solace PubSub+ standard version on those nodes.  In addition, a load balancer, heahth check and three sets of firewall rules will be created.
 
 The `create-centos-vmr-ha-group.sh` script have a number of optional parameters that the user can define to customize their deployment:
 
@@ -33,8 +34,8 @@ The `create-centos-vmr-ha-group.sh` script have a number of optional parameters 
 &nbsp;&nbsp;&nbsp;`The admin password used for all VMRs.`<br/>
 &nbsp;&nbsp;&nbsp;`Default:  admin`<br/>
 
-
 # Set up network security to allow access
+
 Now that the VMR is instantiated, the network security firewall rule should be reviewed and updated as required.  Certain messaging protocols require the user to choose ports, as these messaging services are provisioned, the user will need to update the firewall rules.
 
 For more information on the ports required for the message router see the [configuration defaults](http://docs.solace.com/Solace-VMR-Set-Up/VMR-Configuration-Defaults.htm)
@@ -50,6 +51,20 @@ For persons used to working with Solace message router console access, this is s
 For persons who are unfamiliar with the Solace mesage router or would prefer an administration application the SolAdmin management application is available.  For more information on SolAdmin see the [SolAdmin page](http://dev.solace.com/tech/soladmin/).  To get SolAdmin, visit the Solace [download page](http://dev.solace.com/downloads/) and select OS version desired.  Management IP will be the Public IP associated with youe GCE instance and port will be 8080 by default.
 
 ![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_soladmin.png "soladmin connection to gce")
+
+# How to Delete a VMR HA tuple
+
+Run the `delete-ha-group.sh` contained in this project.  The script will remove all resources provisioned by the `create-centos-ha-group.sh` script, this includes all VMs, firewall rules, load balancer and health check.
+
+The `delete-ha-group.sh` script options must match the corresponding create options in order to delete the appropariate resources:
+
+**`delete-ha-group.sh [OPTIONS]`<br/>**
+&nbsp;&nbsp;&nbsp;`-n=BASENAME | --basename=BASENAME`<br/>
+&nbsp;&nbsp;&nbsp;`The prefix to be used for each VMRs hostname, dashes and underscores not permitted.`<br/>
+&nbsp;&nbsp;&nbsp;`Default:  vmr`<br/>
+&nbsp;&nbsp;&nbsp;`-z=ZONES | --zones=ZONES`<br/>
+&nbsp;&nbsp;&nbsp;`Comma separated list of zones for each of the VMRs, all zones must be in the same region.`<br/>
+&nbsp;&nbsp;&nbsp;`Default:  us-east1-b us-east1-c us-east1-d`<br/>
 
 # Testing data access to the VMR
 
