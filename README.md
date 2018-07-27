@@ -11,6 +11,30 @@ See https://cloud.google.com/sdk/
 * Clone this project, run the `create-centos-vmr-ha-group.sh` script for a full HA triplet with built-in redundancy.
 This will create three GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ standard version on those nodes.  In addition, a load balancer and a default set of firewall rules will be created.
 
+The `create-centos-vmr-ha-group.sh` script have a number of optional parameters that the user can define to customize their deployment:
+
+Usage:  create-centos-ha-group.sh [OPTIONS]
+OPTIONS:
+   -n=BASENAME | --basename=BASENAME
+      The prefix to be used for each VMRs hostname, dashes and underscores not permitted.
+      Default:  vmr
+   -z=ZONES | --zones=ZONES
+      Comma separated list of zones for each of the VMRs, all zones must be in the same region.
+      Default:  us-east1-b us-east1-c us-east1-d
+   -c=CONNECTIONS | --connectionscale=CONNECTIONS
+      VMR connection scaling size (100, 1000, 10000, 100000, 200000).
+      Default:  1000
+   -b=BOOTDISKSIZE | --bootdisksize=BOOTDISKSIZE
+      The size of the VM boot disk, recommend 200GB or greater.
+      Default:  200GB
+   -d=DATADISKSIZE | --datadisksize=DATADISKSIZE
+      The size of the VM message spool disk, recommend 200GB or greater.
+      Default:  200GB
+   -p=ADMINPWD | --adminpassword=ADMINPWD
+      The admin password used for all VMRs.
+      Default:  admin
+
+
 # Set up network security to allow access
 Now that the VMR is instantiated, the network security firewall rule should be reviewed and updated as required.  Certain messaging protocols require the user to choose ports, as these messaging services are provisioned, the user will need to update the firewall rules.
 
