@@ -8,14 +8,11 @@ This is a 2 step process:
 * Download and install the Google SDK on your computer
 See https://cloud.google.com/sdk/
 
-* Clone this project, edit the gce_vmr_startup... scripts as appropriate to change passwords and run either the `create-rhel-vmr-singleton.sh` for a standalone VMR or `create-rhel-vmr-ha-group.sh` script for a full HA triplet with built-in redundancy.
-This will create one or three GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ evaluation version on those nodes.
+* Clone this project, run the `create-centos-vmr-ha-group.sh` script for a full HA triplet with built-in redundancy.
+This will create three GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ standard version on those nodes.  In addition, a load balancer and a default set of firewall rules will be created, these should be reviewed and updated as required.  Certain messaging protocols require the user to choose ports for each protocol, as these messaging services are provisioned, the user will need to update the firewall rules.
 
 # Set up network security to allow access
-Now that the VMR is instantiated, the network security firewall rule needs to be set up to allow access to both the admin application and data traffic.  Under the "Networking -> VPC network -> Firewall rules" tab add a new rule to your project exposing the required ports:
-
-![alt text](https://raw.githubusercontent.com/SolaceLabs/solace-gcp-quickstart/master/images/gce_network.png "GCE Firewall rules")
-`tcp:80;tcp:8080;tcp:1883;tcp:8000;tcp:9000;tcp:55003;tcp:55555`
+Now that the VMR is instantiated, the network security firewall rule should be reviewed and updated as required.  Certain messaging protocols require the user to choose ports, as these messaging services are provisioned, the user will need to update the firewall rules.
 
 For more information on the ports required for the message router see the [configuration defaults](http://docs.solace.com/Solace-VMR-Set-Up/VMR-Configuration-Defaults.htm)
 . For more information on Google Cloud Platform Firewall rules see [Networking and Firewalls](https://cloud.google.com/compute/docs/networks-and-firewalls)
