@@ -83,9 +83,11 @@ if [[ -n $zonelist ]]; then
    unset zones
    zones=(${zonelist//,/ })
 fi
-
 numzones=${#zones[@]}
 
+#
+# Extract region from the zone & confirm all zones are in same region
+#
 region=$(echo ${zones[0]} |cut -d "-" -f1,2)
 for i in ${zones[@]}; do
    if [ $region != $(echo $i |cut -d "-" -f1,2) ]; then
@@ -95,8 +97,9 @@ for i in ${zones[@]}; do
    fi
 done
 
-
+#
 # check if routernames contain any dashes or underscores and abort execution, if that is the case.
+#
 if [[ $basename == *"-"* || $basename == *"_"* ]]; then
   echo "Invalid value for basename:  $basename"
   printUsage
@@ -104,7 +107,9 @@ if [[ $basename == *"-"* || $basename == *"_"* ]]; then
 fi
 
 
-
+#
+# Choose machine type based on connection scale
+#
 if [ ${connections} == "100" ]; then
   machinetype="n1-standard-2" 
 elif [ ${connections} == "1000" ]; then
@@ -131,7 +136,9 @@ echo "datadisksize: $datadisksize"
 echo "adminpwd:     $adminpwd"
 echo "machinetype:  $machinetype"
 
-
+#
+# Create three VMs and their message spool disks
+#
 #os=rhel
 os=centos
 networktag=gce-solace-cluster-${basename}
@@ -148,6 +155,7 @@ for index in 0 1 2; do
     vmtype=$machinetype
   fi
 
+    # Create message spool disk
     gcloud compute disks create ${datadisk} \
     --description="Data disk for VMR ${name}" \
     --labels="usage=solace-vmr-${os}" \
@@ -155,6 +163,7 @@ for index in 0 1 2; do
     --type=pd-ssd \
     --zone=${zone}
 
+    # Create VM
     gcloud compute instances create ${name} \
     --boot-disk-size=${bootdisksize} \
     --boot-disk-type=pd-standard \
@@ -184,7 +193,6 @@ done
 
 
    # Create health check
-   request="/health-check/guaranteed-active"
    gcloud compute http-health-checks create gce-solace-hc-${basename} \
    --check-interval=2 \
    --healthy-threshold=1 \
@@ -192,11 +200,11 @@ done
    --timeout=1 \
    --port=5550 \
    --request-path=/health-check/guaranteed-active
+
+   # Create target pool
    gcloud compute target-pools create gce-solace-hc-pool-${basename} \
    --region=${region} \
    --http-health-check=gce-solace-hc-${basename}
-#   gcloud compute target-pools add-instances gce-solace-hc-pool-${basename} \
-#   --instances=${basename}0,${basename}1,${basename}2 \
    gcloud compute target-pools add-instances gce-solace-hc-pool-${basename} \
    --instances=${basename}0 \
    --instances-zone=${zones[0]}
@@ -217,9 +225,11 @@ done
    --address=gce-solace-${basename}-lb-ip \
    --target-pool=gce-solace-hc-pool-${basename}
 
-
 sleep 60
 
+#
+# Start the VMR installation & configuration for each VM
+#
 for index in 0 1 2; do
   name=${basename}${index}
   if [ "${index}" == "0" ]; then
