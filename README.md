@@ -9,7 +9,7 @@ This is a 2 step process:
 See https://cloud.google.com/sdk/
 
 * Clone this project, run the `create-centos-vmr-ha-group.sh` script for a full HA triplet with built-in redundancy.
-This will create three GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ standard version on those nodes.  In addition, a load balancer and a default set of firewall rules will be created, these should be reviewed and updated as required.  Certain messaging protocols require the user to choose ports for each protocol, as these messaging services are provisioned, the user will need to update the firewall rules.
+This will create three GCE compute nodes with disks for your VMRs and download, install and initialize the latest Solace PubSub+ standard version on those nodes.  In addition, a load balancer and a default set of firewall rules will be created.
 
 # Set up network security to allow access
 Now that the VMR is instantiated, the network security firewall rule should be reviewed and updated as required.  Certain messaging protocols require the user to choose ports, as these messaging services are provisioned, the user will need to update the firewall rules.
