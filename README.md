@@ -16,23 +16,23 @@ The `create-centos-vmr-ha-group.sh` script have a number of optional parameters 
 Usage:  create-centos-ha-group.sh [OPTIONS]
 OPTIONS:
    -n=BASENAME | --basename=BASENAME
-      The prefix to be used for each VMRs hostname, dashes and underscores not permitted.
-      Default:  vmr
+   The prefix to be used for each VMRs hostname, dashes and underscores not permitted.
+   Default:  vmr
    -z=ZONES | --zones=ZONES
-      Comma separated list of zones for each of the VMRs, all zones must be in the same region.
-      Default:  us-east1-b us-east1-c us-east1-d
+   Comma separated list of zones for each of the VMRs, all zones must be in the same region.
+   Default:  us-east1-b us-east1-c us-east1-d
    -c=CONNECTIONS | --connectionscale=CONNECTIONS
-      VMR connection scaling size (100, 1000, 10000, 100000, 200000).
-      Default:  1000
+   VMR connection scaling size (100, 1000, 10000, 100000, 200000).
+   Default:  1000
    -b=BOOTDISKSIZE | --bootdisksize=BOOTDISKSIZE
-      The size of the VM boot disk, recommend 200GB or greater.
-      Default:  200GB
+   The size of the VM boot disk, recommend 200GB or greater.
+   Default:  200GB
    -d=DATADISKSIZE | --datadisksize=DATADISKSIZE
-      The size of the VM message spool disk, recommend 200GB or greater.
-      Default:  200GB
+   The size of the VM message spool disk, recommend 200GB or greater.
+   Default:  200GB
    -p=ADMINPWD | --adminpassword=ADMINPWD
-      The admin password used for all VMRs.
-      Default:  admin
+   The admin password used for all VMRs.
+   Default:  admin
 
 
 # Set up network security to allow access
