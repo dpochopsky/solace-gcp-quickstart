@@ -1,4 +1,5 @@
 #!/bin/bash
+
 URL=""
 USERNAME=admin
 PASSWORD=admin
@@ -6,7 +7,7 @@ LOG_FILE=install.log
 SWAP_FILE=swap
 SOLACE_HOME=`pwd`
 fstype=xfs
-#
+
 #cloud init vars
 #array of all available cloud init variables to attempt to detect and pass to docker image creation
 #see http://docs.solace.com/Solace-VMR-Set-Up/Initializing-Config-Keys-With-Cloud-Init.htm
@@ -99,7 +100,6 @@ if [ ! -d /etc/systemd/system/docker.service.d ]; then
   mkdir /etc/systemd/system/docker.service.d | tee -a install.log
   tee /etc/systemd/system/docker.service.d/docker.conf <<-EOF
 [Service]
-  ExecStart=
   ExecStart=/usr/bin/dockerd --iptables=false --storage-driver=devicemapper
 EOF
 fi
@@ -108,20 +108,12 @@ echo "`date` INFO:/etc/systemd/system/docker.service.d =\n `cat /etc/systemd/sys
 systemctl enable docker | tee -a ${LOG_FILE}
 systemctl start docker | tee -a ${LOG_FILE}
 
-echo "`date` INFO:Set up swap for < 6GB machines" | tee -a ${LOG_FILE}
-# -----------------------------------------
-MEM_SIZE=$(cat /proc/meminfo | grep MemTotal | tr -dc '0-9')
-if [ ${MEM_SIZE} -lt 6087960 ]; then
-  echo "`date` WARN: Not enough memory: ${MEM_SIZE} Creating 2GB Swap space" | tee -a ${LOG_FILE}
-  mkdir /var/lib/solace | tee -a ${LOG_FILE}
-  dd if=/dev/zero of=/var/lib/solace/swap count=2048 bs=1MiB | tee -a ${LOG_FILE}
-  mkswap -f /var/lib/solace/swap | tee -a ${LOG_FILE}
-  chmod 0600 /var/lib/solace/swap | tee -a ${LOG_FILE}
-  swapon -f /var/lib/solace/swap | tee -a ${LOG_FILE}
-  grep -q 'solace\/swap' /etc/fstab || sudo sh -c 'echo "/var/lib/solace/swap none swap sw 0 0" >> /etc/fstab' | tee -a ${LOG_FILE}
-else
-   echo "`date` INFO: Memory size is ${MEM_SIZE}" | tee -a ${LOG_FILE}
-fi
+
+# Setup the TCP buffer limits for connection scaling
+#
+RAM=`cat /proc/meminfo | awk '/MemTotal/ {print $2}'`
+[[ $RAM -gt 24117248 ]] && sysctl net.ipv4.tcp_mem='256000 384000 512000' &>/dev/null
+
 
 echo "`date` Format persistent volume" | tee -a ${LOG_FILE}
 sudo mkfs.${fstype} -q /dev/sdb
@@ -130,13 +122,15 @@ echo "`date` Pre-Define Solace required infrastructure" | tee -a ${LOG_FILE}
 # -----------------------------------------------------
 docker volume create --name=jail \
   --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
+docker volume create --name=diagnostics \
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=var \
   --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=internalSpool \
   --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
-docker volume create --name=adbBackup \
-  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 docker volume create --name=softAdb \
+  --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
+docker volume create --name=adbBackup \
   --opt type=${fstype} --opt device=/dev/sdb | tee -a ${LOG_FILE}
 
 echo "`date` INFO:Get and load the Solace Docker url" | tee -a ${LOG_FILE}
@@ -207,9 +201,12 @@ docker create \
    --ulimit nofile=${ulimit_nofile} \
    --cap-add=IPC_LOCK \
    --cap-add=SYS_NICE \
+   --cap-add=SYS_PTRACE \
+   --stop-timeout=600 \
    --net=host \
    --restart=always \
    -v jail:/usr/sw/jail \
+   -v diagnostics:/var/lib/solace/diags \
    -v var:/usr/sw/var \
    -v internalSpool:/usr/sw/internalSpool \
    -v adbBackup:/usr/sw/adb \
@@ -220,6 +217,19 @@ docker create \
 #
 docker ps -a | tee -a ${LOG_FILE}
 
+tee /usr/local/sbin/solace-container-exec-start-pre <<-EOF
+#! /bin/bash
+
+# Must port forward all packets with dest IP of the load balancer to the internal IP of VMR
+lbIP=`ip route list table local | grep "proto 66" | awk '{print $2}'`
+vmrIP=`ifconfig eth0 | grep "inet " | awk '{print $2}'`
+iptables -t nat -A PREROUTING -d ${lbIP} -j DNAT --to-destination ${vmrIP}
+
+exit 0
+EOF
+
+chmod 755 /usr/local/sbin/solace-container-exec-start-pre
+
 echo "`date` INFO:Construct systemd for VMR" | tee -a ${LOG_FILE}
 # --------------------------------------
 tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
@@ -229,6 +239,7 @@ tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
   After=docker.service
 [Service]
   Restart=always
+  ExecStartPre=/bin/bash -c /usr/local/sbin/solace-container-exec-start-pre
   ExecStart=/usr/bin/docker start -a solace
   ExecStop=/usr/bin/docker stop solace
 [Install]
@@ -236,11 +247,15 @@ tee /etc/systemd/system/solace-docker-vmr.service <<-EOF
 EOF
 echo "`date` INFO:/etc/systemd/system/solace-docker-vmr.service =/n `cat /etc/systemd/system/solace-docker-vmr.service`" | tee -a ${LOG_FILE}
 
+# Setup proper core file management
+sysctl -p /etc/sysctl.d/core-pattern.conf
+
 echo "`date` INFO: Start the VMR"
 # --------------------------
 systemctl daemon-reload | tee -a ${LOG_FILE}
 systemctl enable solace-docker-vmr | tee -a ${LOG_FILE}
 systemctl start solace-docker-vmr | tee -a ${LOG_FILE}
 
+echo "adding firewall rules..."
 
 echo "`date` INFO: Install is complete"
