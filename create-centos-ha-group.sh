@@ -6,6 +6,9 @@ default_connections=1000
 default_bootdisksize=200GB
 default_datadisksize=200GB
 default_adminpwd=admin
+default_externalip=false
+default_loadbalancer=false
+default_firewall=false
 
 printUsage() {
    echo "Usage:  create-centos-ha-group.sh [OPTIONS]"
@@ -28,6 +31,15 @@ printUsage() {
    echo "   -p=ADMINPWD | --adminpassword=ADMINPWD"
    echo "      The admin password used for all VMRs."
    echo "      Default:  $default_adminpwd"
+   echo "   -x | --externalip"
+   echo "      Create external IP for VMs."
+   echo "      Default:  $default_externalip"
+   echo "   -l | --loadbalancer"
+   echo "      Create a load balancer to front VMRs."
+   echo "      Default:  $default_loadbalancer"
+   echo "   -f | --firewall"
+   echo "      Create firewall rules."
+   echo "      Default:  $default_firewall"
    echo ""
 }
 
@@ -38,6 +50,9 @@ connections=$default_connections
 bootdisksize=$default_bootdisksize
 datadisksize=$default_datadisksize
 adminpwd=$default_adminpwd
+externalip=$default_externalip
+loadbalancer=$default_loadbalancer
+firewall=$default_firewall
 
 for i in "$@"
 do
@@ -66,15 +81,27 @@ case $i in
     adminpwd="${i#*=}"
     shift # past argument=value
     ;;
+    -x|--externalip)
+    externalip=true
+    shift # past argument=value
+    ;;
+    -l|--loadbalancer)
+    loadbalancer=true
+    shift # past argument=value
+    ;;
+    -f|--firewall)
+    firewall=true
+    shift # past argument=value
+    ;;
     -h|--help)
     printUsage
     exit
     ;;
     *)
-          # unknown option
-          echo "Unexpected option: $i"
-          printUsage
-          exit -1
+    # unknown option
+    echo "Unexpected option: $i"
+    printUsage
+    exit -1
     ;;
 esac
 done
@@ -135,6 +162,9 @@ echo "bootdisksize: $bootdisksize"
 echo "datadisksize: $datadisksize"
 echo "adminpwd:     $adminpwd"
 echo "machinetype:  $machinetype"
+echo "externalip:   $externalip"
+echo "loadbalancer: $loadbalancer"
+echo "firewall:     $firewall"
 
 #
 # Create three VMs and their message spool disks
@@ -177,6 +207,7 @@ for index in 0 1 2; do
 
 done
 
+if [ $firewall == true ]; then
    # Create firewall rules for external ports 
    gcloud compute firewall-rules create gce-solace-ext-ports-${basename} \
    --allow=tcp:5550,tcp:55555,tcp:55003,tcp:55556,tcp:55443,tcp:80,tcp:443
@@ -190,8 +221,10 @@ done
    gcloud compute firewall-rules create gce-solace-admin-ports-${basename} \
    --target-tags=${networktag} \
    --allow=tcp:22,tcp:8080,tcp:943
+fi
 
 
+if [ $loadbalancer == true ]; then
    # Create health check
    gcloud compute http-health-checks create gce-solace-hc-${basename} \
    --check-interval=2 \
@@ -224,6 +257,7 @@ done
    --ports=1-65535 \
    --address=gce-solace-${basename}-lb-ip \
    --target-pool=gce-solace-hc-pool-${basename}
+fi
 
 sleep 60
 
@@ -242,3 +276,19 @@ for index in 0 1 2; do
   gcloud compute scp gce_vmr_startup.sh ${name}:~/install-vmr.sh
   gcloud compute ssh ${name} --command="sudo ~/install-vmr.sh ${basename} ${role} ${connections} ${adminpwd}"
 done
+
+if [ $externalip != true ]; then
+
+  # Now delete the external interfaces
+  for index in 0 1 2; do
+    name=${basename}${index}
+    zone=${zones[$(($index % $numzones))]}
+
+    gcloud compute instances delete-access-config ${name} \
+    --zone=${zone} \
+    --quiet
+done
+fi
+
+
+
